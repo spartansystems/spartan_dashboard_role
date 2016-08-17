@@ -1,0 +1,9 @@
+---
+- name: install node
+  apt: name=nodejs update_cache=yes
+
+- name: install npm
+  apt: name=npm update_cache=yes
+
+- name: install dashboard
+  npm: "name=jupyter-dashboards-server global=yes"

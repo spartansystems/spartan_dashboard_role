@@ -6,4 +6,33 @@
   apt: name=npm update_cache=yes
 
 - name: install dashboard
-  npm: "name=jupyter-dashboards-server global=yes"
+  npm: "name={{ item }} global=yes"
+  with_items:
+    - jupyter-dashboards-server 
+    - debug
+
+- name: symlink node
+  file:
+    state: link
+    src: /usr/bin/nodejs
+    dest: /usr/local/bin/node
+  become: true
+
+- name: install jupyter_dashboard_server upstart script
+  template:
+    src: ../templates/jupyter_dashboard_server.conf
+    dest: /etc/init/jupyter_dashboard_server.conf
+    mode: 755
+    owner: root
+    group: root
+
+- name: symlink upstart script to init.d
+  file:
+    src: /etc/init/jupyter_dashboard_server.conf
+    dest: /etc/init.d/jupyter_dashboard_server
+    state: link
+  become: true
+
+- name: start new jupyter_dashboard_server service
+  service: name=jupyter_dashboard_server enabled=yes state=restarted
+  become: true
